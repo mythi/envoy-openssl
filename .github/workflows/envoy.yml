@@ -24,7 +24,7 @@ jobs:
         git rev-parse HEAD
     - name: Build latest Envoy submodule
       shell: bash
-      run: envoy/ci/run_envoy_docker.sh 'envoy/ci/do_ci.sh bazel.dev //test/common/... //test/extensions/...'
+      run: envoy/ci/run_envoy_docker.sh 'envoy/ci/do_ci.sh bazel.dev //test/common/...'
       env:
         NUM_CPUS: 2
         ENVOY_BUILD_TARGET: "//:envoy"
