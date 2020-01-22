@@ -1,0 +1,31 @@
+name: CI
+
+on:
+   schedule:
+     - cron: '0 23 * * *'
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Checkout submodules
+      shell: bash
+      run: |
+        auth_header="$(git config --local --get http.https://github.com/.extraheader)"
+        git submodule sync --recursive
+        git -c "http.extraheader=$auth_header" -c protocol.version=2 submodule update --init --remote --force --recursive --depth=1
+    - name: Check Envoy submodule status
+      shell: bash
+      run: |
+        git submodule status envoy
+        git rev-parse HEAD
+    - name: Build latest Envoy submodule
+      shell: bash
+      run: envoy/ci/run_envoy_docker.sh 'envoy/ci/do_ci.sh bazel.dev //test/common/... //test/extensions/...'
+      env:
+        NUM_CPUS: 2
+        ENVOY_BUILD_TARGET: "//:envoy"
+        ENVOY_SRCDIR: "/source/envoy"
